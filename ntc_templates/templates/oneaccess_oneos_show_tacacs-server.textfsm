@@ -1,11 +1,11 @@
 Value TACACS_SERVER (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})
 Value SERVER_PORT (\d+)
-Value SECRET_KEY (\w+)
+Value SECRET_KEY ([\w\!\#\_]+)
 Value SOURCE (\w+\s[\w\/\.]+)
 Value VRF ([\w\-]+)
 
 
 Start
-  ^\s*${TACACS_SERVER}\s+${SERVER_PORT}\s+${SECRET_KEY}\s+${SOURCE}\s*(?:Default-Router)?${VRF}?$$ -> Record
+  ^\s*${TACACS_SERVER}\s+${SERVER_PORT}\s+${SECRET_KEY}\s+${SOURCE}\s*(?:Default-Router)?${VRF}?\s*$$ -> Record
   ^.*$$
   ^. -> Error

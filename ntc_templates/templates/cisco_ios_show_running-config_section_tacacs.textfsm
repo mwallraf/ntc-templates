@@ -1,0 +1,43 @@
+Value Key TACACS_SERVER (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})
+Value Fillup SERVER_PORT (\d+)
+Value Fillup SECRET_KEY ((?:\d+\s+)?.*)
+Value Filldown TACACS_GROUP (\w+)
+Value Filldown SOURCE (\w+\s?[\w\/\.]+)
+Value Filldown VRF ([\w\-]+)
+Value TACACS_SERVER_NAME (\S+)
+
+
+Start
+  ^ip\stacacs\ssource-interface\s+${SOURCE}$$
+  # Legacy config
+  ^tacacs-server\s+host\s+${TACACS_SERVER}(?:\s+port\s+${SERVER_PORT})?\s*$$ -> Continue.Record
+  ^tacacs-server\shost -> Legacy 
+  # Group based config
+  ^aaa\sgroup\sserver\stacacs\+\s${TACACS_GROUP}\s*$$ -> TacacsGroup
+  ^tacacs\sserver\s${TACACS_SERVER_NAME} -> TacacsServer
+  # Finish
+  ^.*$$
+  ^. -> Error
+
+
+Legacy
+  ^tacacs-server\s+host\s+${TACACS_SERVER}(?:\s+port\s+${SERVER_PORT})?\s*$$ -> Record
+  ^tacacs-server\s+key\s+${SECRET_KEY}$$
+  ^.* -> Start
+
+TacacsGroup
+  ^\s+ip\svrf\sforwarding\s${VRF}\s*$$
+  ^\s+ip\stacacs\ssource-interface\s+${SOURCE}
+  ^tacacs\sserver\s${TACACS_SERVER_NAME} -> TacacsServer
+  ^ip\stacacs\ssource-interface\s+${SOURCE} -> Start
+  ^\w -> Start
+
+TacacsServer
+  ^\s+address\sipv4\s${TACACS_SERVER} -> Record
+  ^tacacs\sserver\s${TACACS_SERVER_NAME}
+  ^\s+key\s+${SECRET_KEY}$$ -> Clear
+  ^\s+port\s+${SERVER_PORT}$$ -> Clear
+  ^.* -> Start
+
+EOF
+
