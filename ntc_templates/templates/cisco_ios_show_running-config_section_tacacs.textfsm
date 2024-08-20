@@ -8,7 +8,7 @@ Value TACACS_SERVER_NAME (\S+)
 
 
 Start
-  ^ip\stacacs\ssource-interface\s+${SOURCE}$$
+  ^ip\stacacs\ssource-interface\s+${SOURCE}\s*$$
   # Legacy config
   ^tacacs-server\s+host\s+${TACACS_SERVER}(?:\s+port\s+${SERVER_PORT})?\s*$$ -> Continue.Record
   ^tacacs-server\shost -> Legacy 
